@@ -25,12 +25,26 @@
       loop:
         - https://tcpshield.com/v4
         - https://tcpshield.com/v4-cf
+
     - name: Set tcpshield_ips list
       ansible.builtin.set_fact:
         tcpshield_ips: "{{ tcpshield_ips.results | map(attribute='content') | map('trim') | map('split', '\n') | list | flatten | list }}"
-    - name: Debug tcpshield_ips
-      ansible.builtin.debug:
-        var: tcpshield_ips
+
+    - name: Fetch Cloudflare IPs
+      ansible.builtin.uri:
+        url: "{{ item }}"
+        return_content: true
+        status_code: 200
+      register: cloudflare_ips
+      loop:
+        - https://www.cloudflare.com/ips-v4
+        - https://www.cloudflare.com/ips-v6
+
+    - name: Set tcpshield_ips list
+      ansible.builtin.set_fact:
+        cloudflare_ips_both: "{{ cloudflare_ips.results | map(attribute='content') | map('trim') | map('split', '\n') | list | flatten | list }}"
+        cloudflare_ips_v4: "{{ cloudflare_ips.results[0].content | trim | split('\n') }}"
+        cloudflare_ips_v6: "{{ cloudflare_ips.results[1].content | trim | split('\n') }}"
   roles:
     - role: ufw_config
 

@@ -2,6 +2,60 @@
 # This isn't our full firewall config, but it's a good example of how we use ufw.
 # Check roles/ufw/tasks/main.yml for what is done with these variables.
 ufw_ports:
+  - port: 80
+    proto: tcp
+    rule: reject
+    insert: 0
+    insert_relative_to: last-ipv4 # Inject as the last IPv4 rule.
+    sources:
+      - 0.0.0.0/0
+  - port: 80
+    proto: tcp
+    rule: reject
+    insert: 0
+    insert_relative_to: last-ipv6 # Inject as the last IPv6 rule.
+    sources:
+      - ::/0
+  - port: 443
+    proto: tcp
+    rule: reject
+    insert: 0
+    insert_relative_to: last-ipv4 # Inject as the last IPv4 rule.
+    sources:
+      - 0.0.0.0/0
+  - port: 443
+    proto: tcp
+    rule: reject
+    insert: 0
+    insert_relative_to: last-ipv6 # Inject as the last IPv6 rule.
+    sources:
+      - ::/0
+
+  - port: 443
+    proto: tcp
+    rule: allow
+    insert: 1
+    insert_relative_to: first-ipv4
+    sources: "{{ cloudflare_ips_v4 }}"
+  - port: 80
+    proto: tcp
+    rule: allow
+    insert: 1
+    insert_relative_to: first-ipv4
+    sources: "{{ cloudflare_ips_v4 }}"
+  - port: 443
+    proto: tcp
+    rule: allow
+    insert: 1
+    insert_relative_to: first-ipv6
+    sources: "{{ cloudflare_ips_v6 }}"
+  - port: 80
+    proto: tcp
+    rule: allow
+    insert: 1
+    insert_relative_to: first-ipv6
+    sources: "{{ cloudflare_ips_v6 }}"
+
   - port: 25565
     proto: tcp
     rule: reject # This shouldn't be necessary. Adding it for verbosity.
@@ -30,6 +84,7 @@ ufw_ports:
     insert_relative_to: last-ipv6 # Inject as the last IPv6 rule.
     sources:
       - ::/0
+
   - port: 25565
     proto: tcp
     rule: allow
