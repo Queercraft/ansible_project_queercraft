@@ -1,0 +1,83 @@
+---
+- name: Remove default nginx config
+  become: true
+  ansible.builtin.file:
+    path:
+      - /etc/nginx/sites-enabled/default
+      - /etc/nginx/sites-available/default
+    state: absent
+  notify: Reload nginx
+
+- name: Create all AMP reverse proxy configs
+  become: true
+  ansible.builtin.template:
+    src: "nginx-amp-panel.conf.j2"
+    dest: "/etc/nginx/sites-available/amp-{{ item.instance_name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ amp_instances }}"
+  vars:
+    amp_server_name: "{{ item.server_name }}"
+    amp_external_ip: "{{ item.external_ip }}"
+    amp_localhost_port: "{{ item.localhost_port }}"
+    amp_external_port: "{{ item.external_port }}"
+    amp_cert_path: "{{ item.cert_path }}"
+    amp_key_path: "{{ item.key_path }}"
+  notify: Reload nginx
+
+
+- name: Create all Shoutcast reverse proxy configs
+  become: true
+  ansible.builtin.template:
+    src: "nginx-shoutcast-ssl.conf.j2"
+    dest: "/etc/nginx/sites-available/shoutcast-{{ item.instance_name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ sc_instances }}"
+  vars:
+    sc_server_name: "{{ item.server_name }}"
+    sc_external_ip: "{{ item.external_ip }}"
+    sc_localhost_port: "{{ item.localhost_port }}"
+    sc_external_port: "{{ item.external_port }}"
+    sc_cert_path: "{{ item.cert_path }}"
+    sc_key_path: "{{ item.key_path }}"
+  notify: Reload nginx
+
+- name: Place staffapp config
+  become: true
+  ansible.builtin.template:
+    src: "nginx-staffapp.conf.j2"
+    dest: "/etc/nginx/sites-available/staffapp.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload nginx
+
+- name: Place main site config
+  become: true
+  ansible.builtin.template:
+    src: "nginx-site.conf.j2"
+    dest: "/etc/nginx/sites-available/main-site.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload nginx
+
+- name: Find all configs
+  become: true
+  ansible.builtin.find:
+    paths: /etc/nginx/sites-available
+    patterns: "*.conf"
+  register: nginx_configs
+
+- name: Symlink all configs
+  become: true
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/{{ item }}"
+    dest: "/etc/nginx/sites-enabled/{{ item }}"
+    state: link
+  notify: Reload nginx
+  loop: "{{ nginx_configs.files | map(attribute='path') | map('basename') | list }}"
+...

@@ -1,0 +1,85 @@
+---
+site_url: https://www.queercraft.net
+
+server_name: mc.queercraft.net
+external_ip: 0.0.0.0
+
+cert_path: /etc/letsencrypt/live/mc.queercraft.net/fullchain.pem
+key_path: /etc/letsencrypt/live/mc.queercraft.net/privkey.pem
+
+rewrites:
+  - source: "^/map$"
+    destination: "https://mc.queercraft.net/map/"
+    flags: redirect
+  - source: "^/radio$"
+    destination: "https://mc.queercraft.net/radio/"
+    flags: redirect
+
+
+location_proxies:
+  # - location: /map # Dynmap, comment out for bluemap
+  #   rewrite: "^/map/(.*) /$1 break;"
+  #   proxy_pass: http://127.0.0.1:8123
+  #   extra_lines:
+  #     - "rewrite ^/map/(.*) /$1 break;"
+  - location: /map # Uncomment for bluemap
+    proxy_pass: http://127.0.0.1:8100
+    extra_lines:
+      - "proxy_intercept_errors on;"
+      - "rewrite ^/map/(.*) /$1 break;"
+  - location: /radio
+    proxy_pass: https://prismlgbtq.xyz:443/queercraft-radio/
+    extra_lines:
+      - "proxy_intercept_errors on;"
+      - "rewrite ^/radio/(.*) /queercraft-radio/$1 break;"
+
+amp_instances:
+  - instance_name: ads
+    server_name: mc.queercraft.net
+    external_ip: 54.39.243.77
+    localhost_port: 8080
+    external_port: 8080
+    cert_path: /etc/letsencrypt/live/mc.queercraft.net/fullchain.pem
+    key_path: /etc/letsencrypt/live/mc.queercraft.net/privkey.pem
+  - instance_name: nova5
+    server_name: mc.queercraft.net
+    external_ip: 54.39.243.77
+    localhost_port: 8084
+    external_port: 8084
+    cert_path: /etc/letsencrypt/live/mc.queercraft.net/fullchain.pem
+    key_path: /etc/letsencrypt/live/mc.queercraft.net/privkey.pem
+  - instance_name: nova6
+    server_name: mc.queercraft.net
+    external_ip: 54.39.243.77
+    localhost_port: 8086
+    external_port: 8086
+    cert_path: /etc/letsencrypt/live/mc.queercraft.net/fullchain.pem
+    key_path: /etc/letsencrypt/live/mc.queercraft.net/privkey.pem
+
+sc_instances:
+  - instance_name: shoutcast
+    server_name: mc.queercraft.net
+    external_ip: 0.0.0.0
+    localhost_port: 8008
+    external_port: 8000
+    cert_path: /etc/letsencrypt/live/mc.queercraft.net/fullchain.pem
+    key_path: /etc/letsencrypt/live/mc.queercraft.net/privkey.pem
+
+staffapp_uwsgi_socket: unix:///var/www/qcmodapp/uwsgi.sock
+
+staffapp_server_name: staff.queercraft.net
+staffapp_cert_path: /etc/letsencrypt/live/staff.queercraft.net/fullchain.pem
+staffapp_key_path: /etc/letsencrypt/live/staff.queercraft.net/privkey.pem
+
+staffapp_dir: /var/www/qcmodapp
+
+staffapp_location_aliases:
+  - location: /media
+    alias: "{{ staffapp_dir }}/qcmodapp/media/"
+  - location: /static
+    alias: "{{ staffapp_dir }}/static/"
+  - location: robots.txt
+    alias: "{{ staffapp_dir }}/static/robots.txt"
+  - location: favicon.ico
+    alias: "{{ staffapp_dir }}/static/favicon.ico"
+...

@@ -1,0 +1,41 @@
+---
+site_url: https://example.com
+
+server_name: mc.example.com
+external_ip: 0.0.0.0
+cert_path: /etc/letsencrypt/live/mc.example.com/fullchain.pem
+key_path: /etc/letsencrypt/live/mc.example.com/privkey.pem
+
+rewrites:
+  - source: "^/map$"
+    destination: "https://mc.example.com/map/"
+    flags: redirect
+
+location_proxies:
+  - location: /map # bluemap
+    proxy_pass: http://127.0.0.1:8100
+    extra_lines:
+      - "proxy_intercept_errors on;"
+      - "rewrite ^/map/(.*) /$1 break;"
+
+amp_directory: /opt/cubecoders/amp/
+
+amp_instances:
+  - instance_name: ads
+    server_name: amp.example.com
+    external_ip: 192.168.0.2
+    localhost_port: 8080
+    external_port: 8080
+    cert_path: /etc/letsencrypt/live/amp.example.com/fullchain.pem
+    key_path: /etc/letsencrypt/live/amp.example.com/privkey.pem
+
+sc_instances:
+  - instance_name: shoutcast
+    server_name: sc.example.com
+    external_ip: 192.168.0.2
+    localhost_port: 8008
+    external_port: 8000
+    cert_path: /etc/letsencrypt/live/sc.example.com/fullchain.pem
+    key_path: /etc/letsencrypt/live/sc.example.com/privkey.pem
+
+...

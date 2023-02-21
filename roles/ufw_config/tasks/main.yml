@@ -1,0 +1,28 @@
+---
+- name: Ensure UFW is installed
+  become: true
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+    update_cache: true
+
+- name: Ensure UFW is enabled and started
+  become: true
+  ansible.builtin.service:
+    name: ufw
+    enabled: true
+    state: started
+
+- name: Set UFW rules
+  become: true
+  community.general.ufw:
+    name: "{{ item.0.name | default(omit) }}" # Mutually exclusive with port/proto
+    port: "{{ item.0.port | default(omit) }}"
+    proto: "{{ item.0.proto | default(omit) }}"
+    rule: "{{ item.0.rule | default(omit) }}"
+    insert: "{{ item.0.insert | default(omit) }}"
+    insert_relative_to: "{{ item.0.insert_relative_to | default(omit) }}"
+    from_ip: "{{ item.1 }}"
+  loop: "{{ ufw_ports | subelements('sources') }}"
+  notify: Reload UFW
+...

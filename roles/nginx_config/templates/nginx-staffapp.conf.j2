@@ -1,0 +1,45 @@
+upstream django {
+    server {{ staffapp_uwsgi_socket }};
+}
+
+server {
+    listen {{ external_ip }}:80;
+
+    server_name staff.queercraft.net;
+
+    location / {
+        rewrite ^ https://$host$request_uri? permanent;
+    }
+
+}
+
+server {
+    listen {{ external_ip }}:443 ssl;
+
+    server_name {{ staffapp_server_name }};
+
+    server_tokens off;
+
+    ##
+    # Uncomment to enable whitelist
+    ##
+
+    # include /etc/nginx/ip-whitelist.conf;
+
+    ssl_certificate {{ staffapp_cert_path }};
+    ssl_certificate_key {{ staffapp_key_path }};
+
+    client_max_body_size 50M;
+
+    location / {
+        uwsgi_pass  django;
+        include {{ staffapp_dir }}/uwsgi_params;
+    }
+
+{% for alias in staffapp_location_aliases %}
+    location {{ alias.location }} {
+        alias {{ alias.alias }};
+    }
+{% endfor %}
+
+}

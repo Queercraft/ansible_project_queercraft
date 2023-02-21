@@ -1,0 +1,37 @@
+---
+- name: Configure Nginx
+  hosts: queercraft
+  tags: nginx
+  pre_tasks:
+    - name: Install nginx
+      become: true
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+  roles:
+    - role: nginx_config
+
+- name: Configure UFW
+  hosts: queercraft
+  tags: ufw
+  pre_tasks:
+    - name: Fetch TCPShield IPs
+      ansible.builtin.uri:
+        url: "{{ item }}"
+        return_content: true
+        status_code: 200
+      register: tcpshield_ips
+      loop:
+        - https://tcpshield.com/v4
+        - https://tcpshield.com/v4-cf
+    - name: Set tcpshield_ips list
+      ansible.builtin.set_fact:
+        tcpshield_ips: "{{ tcpshield_ips.results | map(attribute='content') | map('trim') | map('split', '\n') | list | flatten | list }}"
+    - name: Debug tcpshield_ips
+      ansible.builtin.debug:
+        var: tcpshield_ips
+  roles:
+    - role: ufw_config
+
+...

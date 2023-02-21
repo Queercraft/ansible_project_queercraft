@@ -1,0 +1,15 @@
+---
+ufw_ports:
+  - port: 25565
+    proto: tcp
+    rule: allow
+    sources:
+      - 0.0.0.0/0
+      - ::/0
+  - port: 25565
+    proto: udp
+    rule: allow
+    sources:
+      - 0.0.0.0/0
+      - ::/0
+...
