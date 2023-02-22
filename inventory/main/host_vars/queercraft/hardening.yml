@@ -1,0 +1,6 @@
+---
+fail2ban_ssh_port: 1111
+fail2ban_ssh_bantime: 14400
+fail2ban_ssh_maxretry: 3
+
+...

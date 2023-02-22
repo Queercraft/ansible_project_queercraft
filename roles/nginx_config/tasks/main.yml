@@ -1,4 +1,10 @@
 ---
+- name: Install nginx
+  become: true
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
 - name: Remove default nginx config
   become: true
   ansible.builtin.file:

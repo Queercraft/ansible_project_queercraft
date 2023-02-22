@@ -1,0 +1,8 @@
+---
+fail2ban_ssh_enabled: true
+fail2ban_ssh_port: 22
+fail2ban_ssh_bantime: 3600
+fail2ban_ssh_maxretry: 3
+fail2ban_ssh_findtime: 600
+
+...

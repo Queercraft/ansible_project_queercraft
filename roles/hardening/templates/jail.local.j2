@@ -1,0 +1,9 @@
+[sshd]
+enabled = {{ fail2ban_ssh_enabled }}
+port = {{ fail2ban_ssh_port }}
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = {{ fail2ban_ssh_maxretry }}
+findtime = {{ fail2ban_ssh_findtime }}
+bantime = {{ fail2ban_ssh_bantime}}
+ignoreip = 127.0.0.1

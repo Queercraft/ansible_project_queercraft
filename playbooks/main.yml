@@ -2,15 +2,14 @@
 - name: Configure Nginx
   hosts: queercraft
   tags: nginx
-  pre_tasks:
-    - name: Install nginx
-      become: true
-      ansible.builtin.apt:
-        name: nginx
-        state: present
-
   roles:
     - role: nginx_config
+
+- name: Configure hardening
+  hosts: queercraft
+  tags: hardening
+  roles:
+    - role: hardening
 
 - name: Configure UFW
   hosts: queercraft
@@ -40,9 +39,9 @@
         - https://www.cloudflare.com/ips-v4
         - https://www.cloudflare.com/ips-v6
 
-    - name: Set tcpshield_ips list
+    - name: Set cloudflare_ips_ lists
       ansible.builtin.set_fact:
-        cloudflare_ips_both: "{{ cloudflare_ips.results | map(attribute='content') | map('trim') | map('split', '\n') | list | flatten | list }}"
+        # cloudflare_ips_both: "{{ cloudflare_ips.results | map(attribute='content') | map('trim') | map('split', '\n') | list | flatten | list }}"
         cloudflare_ips_v4: "{{ cloudflare_ips.results[0].content | trim | split('\n') }}"
         cloudflare_ips_v6: "{{ cloudflare_ips.results[1].content | trim | split('\n') }}"
   roles:
