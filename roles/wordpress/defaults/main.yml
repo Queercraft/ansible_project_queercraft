@@ -1,0 +1,11 @@
+---
+# defaults file for wordpress
+wordpress_php_fpm_socket: "unix://var/run/php-fpm-wordpress.sock"
+wordpress_external_ip: 0.0.0.0
+wordpress_external_http_port: 80
+wordpress_external_https_port: 443
+
+wordpress_site_domain: example.com
+
+wordpress_cert_path: /etc/letsencrypt/live/example.com/fullchain.pem
+wordpress_key_path: /etc/letsencrypt/live/example.com/privkey.pem

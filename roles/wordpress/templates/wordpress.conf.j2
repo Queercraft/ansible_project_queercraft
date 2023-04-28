@@ -1,0 +1,54 @@
+upstream php {
+    server {{ wordpress_php_fpm_socket }};
+}
+
+server {
+    listen {{ wordpress_external_ip }}:{{ wordpress_external_http_port }} default_server;
+    server_name {{ wordpress_site_domain }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    server_name _{{ wordpress_site_domain }} {{ wordpress_site_domain }};
+    listen {{ wordpress_external_ip }}:{{ wordpress_external_https_port }} ssl default_server;
+
+    server_tokens off;
+    ssl_certificate {{ wordpress_cert_path }};
+    ssl_certificate_key {{ wordpress_key_path }};
+
+    client_max_body_size 512m;
+
+    root /var/www/wordpress;
+    ## This should be in your http block and if it is, it's not needed here.
+    index index.php;
+
+
+    location = /favicon.ico {
+            log_not_found off;
+            access_log off;
+    }
+
+    location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
+    }
+
+    location / {
+            # This is cool because no php is touched for static content.
+            # include the "?$args" part so non-default permalinks doesn't break when using query string
+            try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \.php$ {
+            #NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+            include fastcgi.conf;
+            fastcgi_intercept_errors on;
+            fastcgi_pass php;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+            expires max;
+            log_not_found off;
+    }
+}

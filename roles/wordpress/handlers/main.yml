@@ -1,0 +1,13 @@
+---
+- name: Reload nginx
+  become: true
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+
+- name: Restart PHP-FPM
+  become: true
+  ansible.builtin.service:
+    name: php8.1-fpm
+    state: restarted
+...

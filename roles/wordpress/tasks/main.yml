@@ -1,0 +1,57 @@
+---
+# tasks file for wordpress
+- name: Install dependencies for WordPress
+  become: true
+  ansible.builtin.apt:
+    name:
+      - php
+      - php-mysql
+      - php-curl
+      - php-gd
+      - php-mbstring
+      - php-xml
+      - php-xmlrpc
+      - php-soap
+      - php-intl
+      - php-zip
+      - php-fpm
+
+- name: Copy WordPress nginx template
+  become: true
+  ansible.builtin.template:
+    src: wordpress.conf.j2
+    dest: /etc/nginx/sites-available/wordpress.conf
+    mode: "0644"
+    owner: root
+    group: root
+  notify: Reload nginx
+
+- name: Set up php-fpm with wordpress_php_fpm_socket
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/php/8.1/fpm/pool.d/www.conf
+    regexp: '^listen ='
+    line: 'listen = {{ wordpress_php_fpm_socket_path }}'
+    state: present
+    backup: true
+  notify: Restart PHP-FPM
+
+- name: Set max filesize to 512M
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/php/8.1/fpm/php.ini
+    regexp: '^{{ item }} ='
+    line: '{{ item }} = 512M'
+    state: present
+    backup: true
+  loop:
+    - upload_max_filesize
+    - post_max_size
+  notify: Restart PHP-FPM
+
+- name: Enable and start php-fpm
+  become: true
+  ansible.builtin.service:
+    name: php8.1-fpm
+    state: started
+    enabled: true

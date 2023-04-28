@@ -3,6 +3,7 @@
   hosts: queercraft
   tags: nginx
   roles:
+    - role: wordpress
     - role: nginx_config
 
 - name: Configure hardening
