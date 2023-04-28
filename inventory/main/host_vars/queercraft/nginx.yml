@@ -30,14 +30,15 @@ servers:
     external_https_port: 443
     locations:
       - location: /
-        proxy_pass: https://prismlgbtq.xyz:443/queercraft-radio/
+        proxy_pass: https://prismlgbtq.xyz/radio/
         extra_lines:
-          - "proxy_intercept_errors on;"
+          - "proxy_intercept_errors off;"
           # - "rewrite ^/radio/(.*) /queercraft-radio/$1 break;"
       - location: /stream
-        proxy_pass: http://localhost:8008/
+        proxy_pass: http://localhost:8008
         extra_lines:
-          - "proxy_intercept_errors on;"
+          - "proxy_intercept_errors off;"
+          # - "rewrite ^/stream/(.*) /stream/$1 break;"
 
 amp_instances:
   - instance_name: ads
@@ -88,4 +89,16 @@ staffapp_location_aliases:
     alias: "{{ staffapp_dir }}/static/robots.txt"
   - location: favicon.ico
     alias: "{{ staffapp_dir }}/static/favicon.ico"
+
+wordpress_php_fpm_socket_path: /var/run/php-fpm-wordpress.sock
+wordpress_php_fpm_socket: "unix://{{ wordpress_php_fpm_socket_path }}"
+wordpress_external_ip: 54.39.243.77
+wordpress_external_http_port: 80
+wordpress_external_https_port: 443
+
+wordpress_site_domain: newsite.queercraft.net
+
+wordpress_cert_path: /etc/letsencrypt/live/newsite.queercraft.net/fullchain.pem
+wordpress_key_path: /etc/letsencrypt/live/newsite.queercraft.net/privkey.pem
+
 ...
