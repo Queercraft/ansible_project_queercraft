@@ -34,8 +34,8 @@ servers:
         extra_lines:
           - "proxy_intercept_errors off;"
           # - "rewrite ^/radio/(.*) /queercraft-radio/$1 break;"
-      - location: /stream
-        proxy_pass: http://localhost:8008
+      - location: /stream/
+        proxy_pass: http://localhost:8008/
         extra_lines:
           - "proxy_intercept_errors off;"
           # - "rewrite ^/stream/(.*) /stream/$1 break;"
