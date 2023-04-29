@@ -96,9 +96,6 @@ wordpress_external_ip: 54.39.243.77
 wordpress_external_http_port: 80
 wordpress_external_https_port: 443
 
-wordpress_site_domain: newsite.queercraft.net
-
-wordpress_cert_path: /etc/letsencrypt/live/newsite.queercraft.net/fullchain.pem
-wordpress_key_path: /etc/letsencrypt/live/newsite.queercraft.net/privkey.pem
+wordpress_site_base_domain: queercraft.net
 
 ...
