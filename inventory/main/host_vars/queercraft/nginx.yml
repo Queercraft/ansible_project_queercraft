@@ -30,9 +30,9 @@ servers:
     external_https_port: 443
     locations:
       - location: /
-        proxy_pass: https://prismlgbtq.xyz/radio/
+        custom: true
         extra_lines:
-          - "proxy_intercept_errors off;"
+          - "return 301 https://www.{{ wordpress_site_base_domain }}/radio"
           # - "rewrite ^/radio/(.*) /queercraft-radio/$1 break;"
       - location: /stream/
         proxy_pass: http://localhost:8008/

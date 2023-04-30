@@ -12,17 +12,19 @@ server {
     ssl_certificate_key {{ server.key_path }};
 
     client_max_body_size 20M;
-    {% for location in server.locations %}
+{% for location in server.locations %}
     location {{ location.location }} {
+{% if not location.custom | default(false) %}
         proxy_pass {{ location.proxy_pass }};
         proxy_set_header        Host $host;
         proxy_set_header        X-Real-IP $remote_addr;
         proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header        Upgrade $http_upgrade;
         proxy_set_header        Connection "Upgrade";
+{% endif %}
 {% for line in location.extra_lines %}
         {{ line }}
 {% endfor %}
     }
-    {% endfor %}
+{% endfor %}
 }
