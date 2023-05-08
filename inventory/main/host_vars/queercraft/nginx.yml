@@ -32,7 +32,7 @@ servers:
       - location: /
         custom: true
         extra_lines:
-          - "return 301 https://www.{{ wordpress_site_base_domain }}/radio"
+          - "return 301 https://www.{{ wordpress_site_base_domain }}/radio;"
           # - "rewrite ^/radio/(.*) /queercraft-radio/$1 break;"
       - location: /stream/
         proxy_pass: http://localhost:8008/
@@ -74,7 +74,7 @@ amp_instances:
 
 staffapp_uwsgi_socket: unix:///var/www/qcmodapp/uwsgi.sock
 
-staffapp_server_name: queercraft.net staff.queercraft.net
+staffapp_server_name: staff.queercraft.net
 staffapp_cert_path: /etc/letsencrypt/live/staff.queercraft.net/fullchain.pem
 staffapp_key_path: /etc/letsencrypt/live/staff.queercraft.net/privkey.pem
 
