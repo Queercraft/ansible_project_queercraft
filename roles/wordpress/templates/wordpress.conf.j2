@@ -10,7 +10,7 @@ server {
 
 {% for domain in wordpress_redirect_domains %}
 server {
-    listen {{ wordpress_external_ip }}:{{ wordpress_external_https_port }} ssl default_server;
+    listen {{ wordpress_external_ip }}:{{ wordpress_external_https_port }} ssl;
     server_name {{ domain }};
     return 301 https://{{ wordpress_site_domain }}$request_uri;
 
@@ -23,7 +23,7 @@ server {
 
 server {
     server_name {{ wordpress_site_domain }};
-    listen {{ wordpress_external_ip }}:{{ wordpress_external_https_port }} ssl;
+    listen {{ wordpress_external_ip }}:{{ wordpress_external_https_port }} ssl default_server;
 
     server_tokens off;
     ssl_certificate {{ wordpress_cert_path }};
