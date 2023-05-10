@@ -35,6 +35,9 @@ server {
     ## This should be in your http block and if it is, it's not needed here.
     index index.php;
 
+    location ~ \.user\.ini$ {
+        deny all;
+    }
 
     location = /favicon.ico {
             log_not_found off;
