@@ -1,0 +1,79 @@
+---
+
+- name: Upgrade and reboot
+  hosts: queercraft
+  tags: upgrade
+  tasks:
+    - name: Prompt for confirmation
+      ansible.builtin.pause:
+        prompt: "This playbook will stop all services and reboot the server. Are you sure you want to continue? (YES/NO)"
+      register: confirmation
+      run_once: true
+      delegate_to: localhost
+
+    - name: Fail if confirmation is not 'YES'
+      ansible.builtin.fail:
+        msg: "Confirmation not 'YES'"
+      when:
+        - confirmation.user_input != "YES"
+
+    - name: Stop AMP
+      ansible.builtin.command: ampinstmgr -o
+      register: amp_stop
+      changed_when: amp_stop.rc == 0 and "is already stopped." not in amp_stop.stdout
+
+    - name: Upgrade all AMP instances
+      ansible.builtin.command: ampinstmgr -p
+      register: amp_upgrade
+      changed_when: amp_upgrade.rc == 0 and "[Info] Complete" not in amp_upgrade.stdout
+
+    - name: Stop radio and QCBot
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: stopped
+        scope: user
+      loop:
+        - radio
+        - qcbot
+
+    - name: Stop mariadb
+      become: true
+      ansible.builtin.systemd_service:
+        name: mariadb
+        state: stopped
+
+    - name: Refresh apt cache
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Upgrade packages
+      become: true
+      ansible.builtin.apt:
+        name: "*"
+        state: latest  # noqa package-latest
+        only_upgrade: true
+        autoremove: true
+        autoclean: true
+
+    - name: Reboot
+      become: true
+      ansible.builtin.reboot:
+        reboot_timeout: 600
+      register: reboot
+
+    - name: Ensure qcbot and radio are running
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: started
+        scope: user
+      loop:
+        - radio
+        - qcbot
+
+    - name: Ensure all AMP instances are running
+      ansible.builtin.command: ampinstmgr -a
+      register: amp_status
+      changed_when: amp_status.rc == 0 and "is already running." not in amp_status.stdout
+
+...
