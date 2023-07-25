@@ -1,0 +1,22 @@
+---
+- name: Configure WordPress
+  hosts: queercraft
+  tags: wordpress
+  pre_tasks:
+    - name: Migrate to root URL
+      tags: never, migrate
+      ansible.builtin.replace:
+        path: /var/www/wordpress/wp-config.php
+        regexp: "https://newsite.queercraft.net"
+        replace: 'https://www.queercraft.net'
+        backup: true
+  roles:
+    - role: wordpress
+
+- name: Configure Nginx
+  hosts: queercraft
+  tags: nginx
+  roles:
+    - role: nginx_config
+
+...

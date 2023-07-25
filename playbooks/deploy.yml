@@ -1,0 +1,10 @@
+---
+- name: Import hardening playbook
+  tags: hardening, ufw
+  ansible.builtin.import_playbook: 01-hardening.yml
+
+- name: Import sites playbook
+  tags: sites, nginx, wordpress
+  ansible.builtin.import_playbook: 02-sites.yml
+
+...
