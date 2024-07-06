@@ -1,0 +1,21 @@
+checkmk_agent_version: 2.3.0p9
+checkmk_agent_edition: cre
+
+checkmk_agent_server_protocol: https
+checkmk_agent_server: monitoring.queercraft.net
+checkmk_agent_server_validate_certs: true
+checkmk_agent_site: queercraft
+checkmk_agent_server_ips: [51.222.15.34]
+checkmk_agent_configure_firewall: true
+
+checkmk_agent_mode: pull
+
+checkmk_agent_add_host: true
+checkmk_agent_update: true
+checkmk_agent_tls: true
+checkmk_agent_discover: true
+
+checkmk_agent_user: automation
+checkmk_agent_secret: "{{ vault_checkmk_agent_secret }}"
+checkmk_agent_host_name: mc.queercraft.net
+checkmk_agent_no_log: false
