@@ -1,0 +1,40 @@
+---
+# This is ran daily after midnight to schedule TPS service downtime for the Queercraft Minecraft server.
+- name: "Schedule TPS service downtime for host mc.queercraft.net"
+  hosts: localhost
+  gather_facts: true
+  vars:
+    checkmk_server_url: https://monitoring.queercraft.net
+    checkmk_site: queercraft
+    checkmk_automation_user: automation
+    checkmk_automation_secret: '{{ lookup("env", "CHECKMK_AUTOMATION_SECRET") }}'
+  tasks:
+    - name: "Set TPS service downtime for 5:55am to 6:05am UTC"
+      checkmk.general.downtime:
+        server_url: "{{ checkmk_server_url }}"
+        site: "{{ checkmk_site }}"
+        automation_user: "{{ checkmk_automation_user }}"
+        automation_secret: "{{ checkmk_automation_secret }}"
+        host_name: "mc.queercraft.net"
+        start_time: "{{ ansible_date_time.iso8601 }}T05:55:00Z"
+        end_time: "{{ ansible_date_time.date }}T06:05:00Z"
+        state: "present"
+        # duration: 0
+        service_descriptions:
+          - "TPS"
+
+    - name: "Set TPS service downtime for 5:55pm to 6:05pm UTC"
+      checkmk.general.downtime:
+        server_url: "{{ checkmk_server_url }}"
+        site: "{{ checkmk_site }}"
+        automation_user: "{{ checkmk_automation_user }}"
+        automation_secret: "{{ checkmk_automation_secret }}"
+        host_name: "mc.queercraft.net"
+        start_time: "{{ ansible_date_time.date }}T17:55:00Z"
+        end_time: "{{ ansible_date_time.date }}T18:05:00Z"
+        state: "present"
+        # duration: 0
+        service_descriptions:
+          - "TPS"
+
+...

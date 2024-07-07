@@ -3,6 +3,11 @@
 - name: Upgrade and reboot
   hosts: queercraft
   tags: upgrade
+  vars:
+    checkmk_server_url: https://monitoring.queercraft.net
+    checkmk_site: queercraft
+    checkmk_automation_user: automation
+    checkmk_automation_secret: '{{ checkmk_agent_secret }}'
   tasks:
     - name: Prompt for confirmation
       ansible.builtin.pause:
@@ -16,6 +21,18 @@
         msg: "Confirmation not 'YES'"
       when:
         - confirmation.user_input != "YES"
+
+    - name: "Set host downtime"
+      checkmk.general.downtime:
+        server_url: "{{ checkmk_server_url }}"
+        site: "{{ checkmk_site }}"
+        automation_user: "{{ checkmk_automation_user }}"
+        automation_secret: "{{ checkmk_automation_secret }}"
+        host_name: "mc.queercraft.net"
+        start_time: "{{ ansible_date_time.iso8601 }}"
+        end_after:
+          minutes: 15
+        state: "present"
 
     - name: Stop AMP
       ansible.builtin.command: ampinstmgr -o
